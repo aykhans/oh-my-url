@@ -1,7 +1,6 @@
 package db
 
 import (
-	// "github.com/aykhans/oh-my-url/app/config"
 	"gorm.io/gorm"
 )
 
@@ -13,6 +12,7 @@ type url struct {
 	ID  uint   `gorm:"primaryKey"`
 	Key string `gorm:"unique;not null;size:15;default:null"`
 	URL string `gorm:"not null;default:null"`
+	Count int `gorm:"not null;default:0"`
 }
 
 func (p *Postgres) Init() {
@@ -41,6 +41,8 @@ func (p *Postgres) GetURL(key string) (string, error) {
 	if tx.Error != nil {
 		return "", tx.Error
 	}
+	result.Count++
+	p.gormDB.Save(&result)
 	return result.URL, nil
 }
 
