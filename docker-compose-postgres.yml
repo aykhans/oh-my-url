@@ -20,7 +20,7 @@ services:
     environment:
       - DB=postgres
     env_file:
-      - ./app/config/.env
+      - ./app/config/postgres.env
     ports:
       - "8080:8080"
       - "8081:8081"
