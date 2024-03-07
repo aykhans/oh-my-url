@@ -12,13 +12,13 @@ func main() {
 	config := config.GetAppConfig()
 	dbCreate := db.GetDB()
 	dbCreate.Init()
-	handlerCreate := httpHandlers.HandlerCreate{DB: dbCreate, ForwardDomain: config.FORWARD_DOMAIN}
+	handlerCreate := httpHandlers.HandlerCreate{DB: dbCreate}
 	urlCreateMux := http.NewServeMux()
 	urlCreateMux.HandleFunc("/", handlerCreate.UrlCreate)
 	urlCreateMux.HandleFunc("/favicon.ico", httpHandlers.FaviconHandler)
 
 	dbRead := db.GetDB()
-	handlerForward := httpHandlers.HandlerForward{DB: dbRead, CreateDomain: config.CREATE_DOMAIN}
+	handlerForward := httpHandlers.HandlerForward{DB: dbRead}
 	urlReadMux := http.NewServeMux()
 	urlReadMux.HandleFunc("/", handlerForward.UrlForward)
 	urlReadMux.HandleFunc("/favicon.ico", httpHandlers.FaviconHandler)

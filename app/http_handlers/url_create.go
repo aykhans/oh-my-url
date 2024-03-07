@@ -2,6 +2,7 @@ package httpHandlers
 
 import (
 	"github.com/aykhans/oh-my-url/app/utils"
+	"github.com/aykhans/oh-my-url/app/config"
 	"html/template"
 	"net/http"
 	netUrl "net/url"
@@ -54,7 +55,7 @@ func (hl *HandlerCreate) UrlCreate(w http.ResponseWriter, r *http.Request) {
 			InternalServerError(w, err)
 			return
 		}
-		shortedURL, err := netUrl.JoinPath(hl.ForwardDomain, key)
+		shortedURL, err := netUrl.JoinPath(config.GetForwardDomain(), key)
 		if err != nil {
 			InternalServerError(w, err)
 			return

@@ -8,13 +8,11 @@ import (
 )
 
 type HandlerCreate struct {
-	DB            db.DB
-	ForwardDomain string
+	DB db.DB
 }
 
 type HandlerForward struct {
-	DB           db.DB
-	CreateDomain string
+	DB db.DB
 }
 
 func FaviconHandler(w http.ResponseWriter, r *http.Request) {

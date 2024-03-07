@@ -37,6 +37,14 @@ func GetAppConfig() *AppConfig {
 	}
 }
 
+func GetForwardDomain() string {
+	return GetEnvOrPanic("FORWARD_DOMAIN")
+}
+
+func GetCreateDomain() string {
+	return GetEnvOrPanic("CREATE_DOMAIN")
+}
+
 func GetPostgresConfig() *PostgresConfig {
 	return &PostgresConfig{
 		USER:     GetEnvOrPanic("POSTGRES_USER"),
