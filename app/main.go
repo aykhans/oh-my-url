@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	config := config.GetAppConfig()
+	appConfig := config.GetAppConfig()
 	dbCreate := db.GetDB()
 	dbCreate.Init()
 	handlerCreate := httpHandlers.HandlerCreate{DB: dbCreate}
@@ -27,11 +27,11 @@ func main() {
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		panic(http.ListenAndServe(":"+config.LISTEN_PORT_CREATE, urlCreateMux))
+		panic(http.ListenAndServe(":"+appConfig.LISTEN_PORT_CREATE, urlCreateMux))
 	}()
 	go func() {
 		defer wg.Done()
-		panic(http.ListenAndServe(":"+config.LISTEN_PORT_FORWARD, urlReadMux))
+		panic(http.ListenAndServe(":"+appConfig.LISTEN_PORT_FORWARD, urlReadMux))
 	}()
 	wg.Wait()
 }
