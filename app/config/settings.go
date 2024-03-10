@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -28,6 +29,16 @@ type PostgresConfig struct {
 	DBNAME   string
 }
 
+type CassandraConfig struct {
+	USER         string
+	PASSWORD     string
+	KEYSPACE     string
+	CLUSTERS     []string
+	APP_LABEL    string
+	URL_START_ID int
+	URL_END_ID   int
+}
+
 func GetAppConfig() *AppConfig {
 	return &AppConfig{
 		LISTEN_PORT_CREATE:  GetEnvOrPanic("LISTEN_PORT_CREATE"),
@@ -52,6 +63,18 @@ func GetPostgresConfig() *PostgresConfig {
 		HOST:     GetEnvOrPanic("POSTGRES_HOST"),
 		PORT:     GetEnvOrDefault("POSTGRES_PORT", "5432"),
 		DBNAME:   GetEnvOrPanic("POSTGRES_DB"),
+	}
+}
+
+func GetCassandraConfig() *CassandraConfig {
+	return &CassandraConfig{
+		USER:         GetEnvOrPanic("CASSANDRA_USER"),
+		PASSWORD:     GetEnvOrPanic("CASSANDRA_PASSWORD"),
+		CLUSTERS:     strings.Split(GetEnvOrPanic("CASSANDRA_CLUSTERS"), ","),
+		KEYSPACE:     GetEnvOrPanic("CASSANDRA_KEYSPACE"),
+		APP_LABEL:    GetEnvOrPanic("CASSANDRA_APP_LABEL"),
+		URL_START_ID: Str2IntOrPanic(GetEnvOrPanic("CASSANDRA_URL_START_ID")),
+		URL_END_ID:   Str2IntOrPanic(GetEnvOrPanic("CASSANDRA_URL_END_ID")),
 	}
 }
 
@@ -83,4 +106,12 @@ func GetEnvOrPanic(key string) string {
 		panic("Environment variable " + key + " is not set")
 	}
 	return value
+}
+
+func Str2IntOrPanic(value string) int {
+	i, err := strconv.Atoi(value)
+	if err != nil {
+		panic(err)
+	}
+	return i
 }

@@ -1,0 +1,6 @@
+FROM cassandra:4
+
+COPY init-cassandra.sh /init-cassandra.sh
+RUN chmod +x init-cassandra.sh
+
+CMD ["/init-cassandra.sh"]
