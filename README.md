@@ -15,7 +15,7 @@
     - `/app/config/cassandra.env.example` to `/app/config/cassandra.env`
     - `/config/cassandra/init-cassandra.env.example` to `/config/cassandra/init-cassandra.env`
 
-- Run the following command to start the application with PostgreSQL:
+- Run the following command to start the application with Cassandra:
     ```bash
     docker compose -f docker-compose-cassandra.yml up
     ```
