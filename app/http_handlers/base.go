@@ -23,3 +23,8 @@ func InternalServerError(w http.ResponseWriter, err error) {
 	log.Fatal(err)
 	http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 }
+
+func Error503(w http.ResponseWriter, err error) {
+	log.Println(err)
+	http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
+}

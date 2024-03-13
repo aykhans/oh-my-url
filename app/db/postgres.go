@@ -1,6 +1,9 @@
 package db
 
 import (
+	"log"
+
+	"github.com/aykhans/oh-my-url/app/errors"
 	"gorm.io/gorm"
 )
 
@@ -9,10 +12,10 @@ type Postgres struct {
 }
 
 type url struct {
-	ID  uint   `gorm:"primaryKey"`
-	Key string `gorm:"unique;not null;size:15;default:null"`
-	URL string `gorm:"not null;default:null"`
-	Count int `gorm:"not null;default:0"`
+	ID    uint   `gorm:"primaryKey"`
+	Key   string `gorm:"unique;not null;size:15;default:null"`
+	URL   string `gorm:"not null;default:null"`
+	Count int    `gorm:"not null;default:0"`
 }
 
 func (p *Postgres) Init() {
@@ -30,7 +33,8 @@ func (p *Postgres) CreateURL(mainUrl string) (string, error) {
 	url := url{URL: mainUrl}
 	tx := p.gormDB.Create(&url)
 	if tx.Error != nil {
-		return "", tx.Error
+		log.Println(tx.Error)
+		return "", errors.ErrDBCreateURL
 	}
 	return url.Key, nil
 }
@@ -39,7 +43,11 @@ func (p *Postgres) GetURL(key string) (string, error) {
 	var result url
 	tx := p.gormDB.Where("key = ?", key).First(&result)
 	if tx.Error != nil {
-		return "", tx.Error
+		log.Println(tx.Error)
+		if tx.Error == gorm.ErrRecordNotFound {
+			return "", errors.ErrDBURLNotFound
+		}
+		return "", errors.ErrDBGetURL
 	}
 	result.Count++
 	p.gormDB.Save(&result)

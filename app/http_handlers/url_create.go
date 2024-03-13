@@ -1,18 +1,21 @@
 package httpHandlers
 
 import (
-	"github.com/aykhans/oh-my-url/app/utils"
-	"github.com/aykhans/oh-my-url/app/config"
 	"html/template"
+	"log"
 	"net/http"
 	netUrl "net/url"
 	"regexp"
+
+	"github.com/aykhans/oh-my-url/app/config"
+	"github.com/aykhans/oh-my-url/app/errors"
+	"github.com/aykhans/oh-my-url/app/utils"
 )
 
 type CreateData struct {
 	ShortedURL string
 	MainURL    string
-	Error      string
+	Error      error
 }
 
 func (hl *HandlerCreate) UrlCreate(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +26,8 @@ func (hl *HandlerCreate) UrlCreate(w http.ResponseWriter, r *http.Request) {
 
 	tmpl, err := template.ParseFiles(utils.GetTemplatePaths("index.html")...)
 	if err != nil {
-		InternalServerError(w, err)
+		log.Println(err)
+		InternalServerError(w, errors.ErrAPITemplateParsing)
 		return
 	}
 
@@ -31,7 +35,8 @@ func (hl *HandlerCreate) UrlCreate(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		err = tmpl.Execute(w, nil)
 		if err != nil {
-			InternalServerError(w, err)
+			log.Println(err)
+			InternalServerError(w, errors.ErrAPITemplateParsing)
 			return
 		}
 	case http.MethodPost:
@@ -41,23 +46,33 @@ func (hl *HandlerCreate) UrlCreate(w http.ResponseWriter, r *http.Request) {
 		if !isValidUrl {
 			data := CreateData{
 				MainURL: url,
-				Error:   "Invalid URL",
+				Error:   errors.ErrAPIInvalidURL,
 			}
 			err = tmpl.Execute(w, data)
 			if err != nil {
-				InternalServerError(w, err)
+				log.Println(err)
+				InternalServerError(w, errors.ErrAPITemplateParsing)
 			}
 			return
 		}
 
 		key, err := hl.DB.CreateURL(url)
 		if err != nil {
-			InternalServerError(w, err)
+			data := CreateData{
+				MainURL: url,
+				Error:   errors.ErrAPI503,
+			}
+			err = tmpl.Execute(w, data)
+			if err != nil {
+				log.Println(err)
+				InternalServerError(w, errors.ErrAPITemplateParsing)
+			}
 			return
 		}
 		shortedURL, err := netUrl.JoinPath(config.GetForwardDomain(), key)
 		if err != nil {
-			InternalServerError(w, err)
+			log.Println(err)
+			InternalServerError(w, errors.ErrAPITemplateParsing)
 			return
 		}
 		data := CreateData{
@@ -66,7 +81,8 @@ func (hl *HandlerCreate) UrlCreate(w http.ResponseWriter, r *http.Request) {
 		}
 		err = tmpl.Execute(w, data)
 		if err != nil {
-			InternalServerError(w, err)
+			log.Println(err)
+			InternalServerError(w, errors.ErrAPITemplateParsing)
 			return
 		}
 

@@ -1,11 +1,13 @@
 package main
 
 import (
+	"log"
+	"net/http"
+	"sync"
+
 	"github.com/aykhans/oh-my-url/app/config"
 	"github.com/aykhans/oh-my-url/app/db"
 	"github.com/aykhans/oh-my-url/app/http_handlers"
-	"net/http"
-	"sync"
 )
 
 func main() {
@@ -27,11 +29,25 @@ func main() {
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		panic(http.ListenAndServe(":"+appConfig.LISTEN_PORT_CREATE, urlCreateMux))
+		for {
+			err := http.ListenAndServe(":"+appConfig.LISTEN_PORT_CREATE, urlCreateMux)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			break
+		}
 	}()
 	go func() {
 		defer wg.Done()
-		panic(http.ListenAndServe(":"+appConfig.LISTEN_PORT_FORWARD, urlReadMux))
+		for {
+			err := http.ListenAndServe(":"+appConfig.LISTEN_PORT_FORWARD, urlReadMux)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			break
+		}
 	}()
 	wg.Wait()
 }

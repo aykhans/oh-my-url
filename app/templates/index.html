@@ -93,7 +93,7 @@
     <h1>Oh My URL!</h1>
     <form action="/" method="post">
       {{ if .Error }}
-        <label for="urlInput" style="color: red;">{{ .Error }}</label>
+        <label for="urlInput" style="color: red;">{{ .Error.Error }}</label>
       {{ end }}
       <input type="url" id="urlInput" name="url" placeholder="https://example.com/" value="{{ if .MainURL }}{{ .MainURL }}{{ end }}" required>
       {{ if .ShortedURL }}

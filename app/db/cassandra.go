@@ -1,10 +1,10 @@
 package db
 
 import (
-	"errors"
 	"log"
 	"sync"
 
+	"github.com/aykhans/oh-my-url/app/errors"
 	"github.com/aykhans/oh-my-url/app/utils"
 	"github.com/gocql/gocql"
 )
@@ -58,11 +58,11 @@ func (c *Cassandra) CreateURL(url string) (string, error) {
 	applied, err := c.db.Query(query, id, key, url, 0).Consistency(gocql.All).MapScanCAS(m)
 	if err != nil {
 		log.Println(err)
-		return "", err
+		return "", errors.ErrDBCreateURL
 	}
 	if !applied {
 		log.Println("Failed to insert unique key")
-		return "", errors.New("an error occurred, please try again later")
+		return "", errors.ErrDBCreateURL
 	}
 	c.currentID.ID = id
 
@@ -76,7 +76,11 @@ func (c *Cassandra) GetURL(key string) (string, error) {
 		Consistency(gocql.One).
 		Scan(&url)
 	if err != nil {
-		return "", err
+		log.Println(err)
+		if err == gocql.ErrNotFound {
+			return "", errors.ErrDBURLNotFound
+		}
+		return "", errors.ErrDBGetURL
 	}
 	return url, nil
 }
